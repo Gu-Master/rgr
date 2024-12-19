@@ -93,7 +93,8 @@ GURACHEVSKII NIKITA
 
 Доброе утро Вера Геннадьевна!  Вот мой график =)
 
-![img.png](img.png)
+![image](https://github.com/user-attachments/assets/a47414bd-7117-495b-bbc5-ea3666dd9770)
+
 
 
 
