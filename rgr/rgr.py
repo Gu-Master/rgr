@@ -145,14 +145,3 @@ if received_crc == calculated_crc:
 else:
     print("CRC не совпадает, данные повреждены.")
     decoded_bits = []
-
-# Восстановление текста из битов
-if decoded_bits:
-    decoded_text = ""
-    for i in range(0, len(decoded_bits), 8):
-        char_bits = decoded_bits[i:i + 8]
-        char = chr(int("".join(map(str, char_bits)), 2))
-        decoded_text += char
-    print("Восстановленный текст:", decoded_text)
-else:
-    print("Не удалось восстановить текст.")

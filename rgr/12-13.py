@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import random
 
 
 # Функция преобразования строки в битовую последовательность
@@ -41,31 +40,7 @@ def bits_to_string(bits):
 def visualize_spectrum(signal, fs, title="Signal Spectrum"):
     frequencies = np.fft.fftfreq(len(signal), 1 / fs)  # Частоты для спектра
     spectrum = np.abs(np.fft.fft(signal))  # Преобразование Фурье сигнала
-
-    plt.figure(figsize=(10, 4))
-    plt.plot(frequencies, spectrum)
-    plt.xlabel("Frequency (Hz)")
-    plt.ylabel("Magnitude")
-    plt.title(title)
-    plt.grid(True)
-    plt.show()
-
-
-# Функция визуализации битовой последовательности
-def visualize_bits(bits, title="Bit Visualization"):
-    fig, ax = plt.subplots(figsize=(10, 2))
-    ax.step(range(len(bits)), bits, where='post')
-
-    min_val = min(bits)
-    max_val = max(bits)
-    if min_val != max_val:
-        ax.set_ylim([min_val - 0.5, max_val + 0.5])
-
-    ax.set_xlabel("Bit Index")
-    ax.set_ylabel("Bit Value")
-    ax.set_title(title)
-    ax.grid(True)
-    plt.show()
+    return frequencies, spectrum
 
 
 # 12) Удаление CRC и восстановление текста
@@ -95,37 +70,38 @@ if __name__ == "__main__":
     fs = 100  # частота дискретизации
     samples_per_bit_values = [5, 10, 20]  # длительности символов
 
-    for samples_per_bit in samples_per_bit_values:
+    plt.figure(figsize=(12, 12))  # Устанавливаем размер окна для всех графиков
+
+    for i, samples_per_bit in enumerate(samples_per_bit_values, 1):
         # Генерация временных выборок
         time_samples = []
         for bit in bit_sequence_with_crc:
             time_samples.extend([bit] * samples_per_bit)
 
-        # Визуализация спектра
-        visualize_spectrum(time_samples, fs, f"Спектр сигнала (N={samples_per_bit})")
+        # Оригинальный сигнал
+        freqs, spectrum = visualize_spectrum(time_samples, fs, f"Спектр сигнала (N={samples_per_bit})")
 
         # Зашумленный сигнал
         noise = np.random.normal(0, 0.5, len(time_samples))  # Добавление шума
         noisy_signal = (np.array(time_samples) + noise).tolist()
-        visualize_spectrum(noisy_signal, fs, f"Спектр зашумленного сигнала (N={samples_per_bit})")
+        freqs_noisy, spectrum_noisy = visualize_spectrum(noisy_signal, fs,
+                                                         f"Спектр зашумленного сигнала (N={samples_per_bit})")
 
-    # Визуализация всех спектров на одном графике
-    plt.figure(figsize=(12, 6))
+        # Отображаем графики для оригинального сигнала
+        plt.subplot(len(samples_per_bit_values), 2, 2 * i - 1)
+        plt.plot(freqs, spectrum)
+        plt.xlabel("Frequency (Hz)")
+        plt.ylabel("Magnitude")
+        plt.title(f"Спектр сигнала (N={samples_per_bit})")
+        plt.grid(True)
 
-    for samples_per_bit in samples_per_bit_values:
-        time_samples = []
-        for bit in bit_sequence_with_crc:
-            time_samples.extend([bit] * samples_per_bit)
+        # Отображаем графики для зашумленного сигнала
+        plt.subplot(len(samples_per_bit_values), 2, 2 * i)
+        plt.plot(freqs_noisy, spectrum_noisy)
+        plt.xlabel("Frequency (Hz)")
+        plt.ylabel("Magnitude")
+        plt.title(f"Спектр зашумленного сигнала (N={samples_per_bit})")
+        plt.grid(True)
 
-        # Оригинальный сигнал
-        plt.subplot(3, 1, 1)
-        visualize_spectrum(time_samples, fs, f"Спектр сигнала (N={samples_per_bit})")
-
-        # Зашумленный сигнал
-        noise = np.random.normal(0, 0.5, len(time_samples))
-        noisy_signal = (np.array(time_samples) + noise).tolist()
-        plt.subplot(3, 1, 2)
-        visualize_spectrum(noisy_signal, fs, f"Спектр зашумленного сигнала (N={samples_per_bit})")
-
-    plt.tight_layout()
+    plt.tight_layout()  # Улучшение компоновки графиков
     plt.show()
